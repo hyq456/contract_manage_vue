@@ -110,6 +110,36 @@
                     </mu-list-item>
                 </mu-list-item>
 
+                <mu-list-item
+                    button
+                    :ripple="false"
+                    nested
+                    :open="open === 'receipt'"
+                    @toggle-nested="open = arguments[0] ? 'receipt' : ''"
+                >
+                    <mu-list-item-action>
+                        <mu-icon value="check_box"></mu-icon>
+                    </mu-list-item-action>
+                    <mu-list-item-title>发票管理</mu-list-item-title>
+                    <mu-list-item-action>
+                        <mu-icon class="toggle-icon" size="24" value="keyboard_arrow_down"></mu-icon>
+                    </mu-list-item-action>
+                    <mu-list-item
+                        button
+                        :ripple="false"
+                        slot="nested"
+                        :to="{name:'MyReceipt'}"
+                    >
+                        <mu-list-item-title>我的发票</mu-list-item-title>
+                    </mu-list-item>
+                    <mu-list-item button :ripple="false" slot="nested" :to="{name:'ApprovedList'}">
+                        <mu-list-item-title>待审批</mu-list-item-title>
+                    </mu-list-item>
+                    <mu-list-item button :ripple="false" slot="nested" :to="{name:'ApprovedList'}">
+                        <mu-list-item-title>已审批</mu-list-item-title>
+                    </mu-list-item>
+                </mu-list-item>
+
                 <mu-list-item button :to="{name:'FiledList'}">
                     <mu-list-item-action>
                         <mu-icon value="folder"></mu-icon>

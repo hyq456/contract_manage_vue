@@ -137,12 +137,12 @@
                     <p>备注：{{prop.row.more}}</p>
                     <p>时间：{{prop.row.time}}</p>
                     <mu-button
-                        v-if="prop.row.type == 1"
+                        v-if="prop.row.type == 0 && prop.row.receipt == 1"
                         color="info"
                         @click="openTakeDialog(prop.row.id)"
                     >开票申请</mu-button>
                     <mu-button
-                        v-if="prop.row.type == 0"
+                        v-if="prop.row.type == 1 && prop.row.receipt == 1"
                         color="info"
                         @click="openGetDialog(prop.row.id)"
                     >收票申请</mu-button>
@@ -287,6 +287,7 @@ export default {
             },
             //开发票表单
             takeForm: {
+                recordId:"",
                 amount: "",
                 partyB: "",
                 receiptName: "",
@@ -294,6 +295,7 @@ export default {
             },
             //收发票表单
             getForm: {
+                recordId:"",
                 amount: "",
                 partyB: "",
                 receiptName: "",
@@ -342,6 +344,7 @@ export default {
                     }
                 })
                 .then(response => {
+                    this.takeForm.recordId = id;
                     this.takeForm.amount = response.data.data.number;
                     this.takeForm.partyB = this.contractData.partyB;
                     this.takeForm.receiptName = response.data.data.name;
@@ -357,6 +360,7 @@ export default {
                     }
                 })
                 .then(response => {
+                    this.getForm.recordId = id;
                     this.getForm.amount = response.data.data.number;
                     this.getForm.partyB = this.contractData.partyB;
                     this.getForm.receiptName = response.data.data.name;
@@ -364,16 +368,18 @@ export default {
                     console.log(id);
                 });
         },
-        // Todo
         submitTakeReceipt() {
             this.$refs.takeForm.validate().then(result => {
                 if (result) {
                     this.$axios.post("/receipt",
                             qs.stringify({
+                                recordId:this.takeForm.recordId,
                                 amount: this.takeForm.amount,
                                 receiptName: this.takeForm.receiptName,
                                 partyB: this.takeForm.partyB,
-                                notes: this.takeForm.notes
+                                notes: this.takeForm.notes,
+                                belong:this.$store.state.user.id,
+                                contractId:this.contractData.id,
                             })
                         )
                         .then(response => {
@@ -387,8 +393,8 @@ export default {
                                 this.openTake = false;
                                 // todo 
                                 // 将状态改为审批中
-                                if (this.contractData.remainder == 0)
-                                    this.finish = true;
+                                // 改为刷新，试试效果
+                                this.$router.go(0)
                             } else {
                                 let _self = this;
                                 this.$options.methods.openSnackbar(
@@ -406,8 +412,52 @@ export default {
             });
         },
 
-        // todo
-        submitGetReceipt() {},
+        submitGetReceipt() {
+            this.$refs.getForm.validate().then(result => {
+                if (result) {
+                    this.$axios.post("/receipt",
+                            qs.stringify({
+                                recordId:this.getForm.recordId,
+                                amount: this.getForm.amount,
+                                receiptName: this.getForm.receiptName,
+                                partyB: this.getForm.partyB,
+                                notes: this.getForm.notes,
+                                receiptDate: this.getForm.receiptDate,
+                                receiptCode: this.getForm.receiptCode,
+                                receiptNumber: this.getForm.receiptNumber,
+                                belong:this.$store.state.user.id,
+                                contractId:this.contractData.id,
+                            })
+                        )
+                        .then(response => {
+                            if (response.data.code == 200) {
+                                let _self = this;
+                                this.$options.methods.openSnackbar(
+                                    _self,
+                                    "success",
+                                    "申请收票成功，审批中..."
+                                );
+                                this.openGet = false;
+                                // todo 
+                                // 将状态改为审批中
+                                // 改为刷新，试试效果
+                                this.$router.go(0)
+                            } else {
+                                let _self = this;
+                                this.$options.methods.openSnackbar(
+                                    _self,
+                                    "error",
+                                    "申请收票失败,请重试"
+                                );
+                                this.openGet = false;
+                            }
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        });
+                }
+            });
+        },
 
         submitRecord() {
             if (this.recordForm.number > this.contractData.remainder) {
@@ -427,7 +477,8 @@ export default {
                                     type: this.recordForm.type,
                                     number: this.recordForm.number,
                                     time: this.recordForm.time,
-                                    more: this.recordForm.more
+                                    more: this.recordForm.more,
+                                    
                                 })
                             )
                             .then(response => {
@@ -636,8 +687,7 @@ export default {
             });
     },
     components: {
-        myheader,
-        record
+        myheader
     }
 };
 </script>
