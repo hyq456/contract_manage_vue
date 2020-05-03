@@ -197,6 +197,14 @@ const routes = [
       requireAuth: true,
     }
   },
+  {
+    path: '/receipt/info',
+    name: 'ReceiptInfo',
+    component: () => import('../views/receipts_manage/ReceiptInfo.vue'),
+    meta: {
+      requireAuth: true,
+    }
+  },
 ]
 
 const router = new VueRouter({

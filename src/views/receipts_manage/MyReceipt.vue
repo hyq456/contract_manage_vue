@@ -11,7 +11,7 @@
             transform: translate(-50%, -50%);"
         >暂无发票！</h3>
         <mu-list class="list" v-for="receipt,index in searchlist" :key="index" textline="two-line">
-            <mu-list-item :to="{name:'Reviewing', query:{id: receipt.id}}">
+            <mu-list-item :to="{name:'ReceiptInfo', query:{id: receipt.receiptID}}">
             <!-- <mu-list-item :to='/mycontract/'> -->
 
                 <mu-list-item-content>
