@@ -42,8 +42,9 @@ Vue.use(vant);
 Vue.use(Toast);
 Vue.use(NProgress);
 Vue.use(MuseUI);
-Vue.config.productionTip = false
+// Vue.config.productionTip = false
 
+Vue.config.devtools = true
 Vue.component('v-chart', ECharts)
 
 Vue.prototype.$axios = axios;
