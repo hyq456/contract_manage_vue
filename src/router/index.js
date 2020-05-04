@@ -205,6 +205,22 @@ const routes = [
       requireAuth: true,
     }
   },
+  {
+    path:'/receipt/leaderapprove',
+    name:'LeaderApprove',
+    component: () => import('../views/receipts_manage/WaitApproveLeader.vue'),
+    meta: {
+      requireAuth: true,
+    }
+  },
+  {
+    path:'/receipt/leaderapprove/info',
+    name:'LeaderApproveInfo',
+    component: () => import('../views/receipts_manage/ApproveLeader.vue'),
+    meta: {
+      requireAuth: true,
+    }
+  }
 ]
 
 const router = new VueRouter({

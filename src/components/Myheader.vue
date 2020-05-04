@@ -132,7 +132,7 @@
                     >
                         <mu-list-item-title>我的发票</mu-list-item-title>
                     </mu-list-item>
-                    <mu-list-item button :ripple="false" slot="nested" :to="{name:'ApprovedList'}">
+                    <mu-list-item button :ripple="false" slot="nested" :to="{name:'LeaderApprove'}">
                         <mu-list-item-title>待审批</mu-list-item-title>
                     </mu-list-item>
                     <mu-list-item button :ripple="false" slot="nested" :to="{name:'ApprovedList'}">

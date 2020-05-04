@@ -192,8 +192,6 @@ export default {
                             })
                         )
                         .then(response => {
-                            
-
                             if (response.data.code == 200) {
                                 if (this.delfile != "") {
                                     this.$axios.post(

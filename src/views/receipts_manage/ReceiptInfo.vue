@@ -81,9 +81,8 @@
 
 <script>
 import myheader from "../../components/Myheader";
-import qs from "qs";
 export default {
-     data() {
+    data() {
         return {
             title: "我的发票",
             receiptData: "",
