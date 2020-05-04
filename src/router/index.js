@@ -208,7 +208,7 @@ const routes = [
   {
     path:'/receipt/leaderapprove',
     name:'LeaderApprove',
-    component: () => import('../views/receipts_manage/WaitApproveLeader.vue'),
+    component: () => import('../views/receipts_manage/LeaderWaitApprove.vue'),
     meta: {
       requireAuth: true,
     }
@@ -216,11 +216,19 @@ const routes = [
   {
     path:'/receipt/leaderapprove/info',
     name:'LeaderApproveInfo',
-    component: () => import('../views/receipts_manage/ApproveLeader.vue'),
+    component: () => import('../views/receipts_manage/LeaderApprove.vue'),
     meta: {
       requireAuth: true,
     }
-  }
+  },
+  {
+    path:'/receipt/financeapprove/info',
+    name:'FinanceApproveInfo',
+    component: () => import('../views/receipts_manage/FinanceApprove.vue'),
+    meta: {
+      requireAuth: true,
+    }
+  },
 ]
 
 const router = new VueRouter({
