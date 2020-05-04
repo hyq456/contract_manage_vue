@@ -501,8 +501,7 @@ export default {
                                             100;
                                     this.$options.methods.clear(_self);
                                     this.openSimple = false;
-                                    if (this.contractData.remainder == 0)
-                                        this.finish = true;
+                                    
                                 } else {
                                     let _self = this;
                                     this.$options.methods.openSnackbar(
@@ -667,7 +666,7 @@ export default {
                     100 -
                     (this.contractData.remainder / this.contractData.total) *
                         100;
-                if (this.contractData.remainder == 0) this.finish = true;
+                if (this.contractData.unreceipt == 0) this.finish = true;
                 if (this.contractData.type == 0) {
                     this.recordForm.type = "1";
                 } else {
