@@ -8,7 +8,6 @@
             class="contract-form"
             label-position="left"
             label-width="100"
-            :auto-validate="false"
         >
             <mu-form-item label="发票名称" prop="receiptName">
                 <mu-text-field v-model="form.receiptName" disabled></mu-text-field>
@@ -19,20 +18,28 @@
             <mu-form-item label="发票金额" prop="amount">
                 <mu-text-field v-model="form.amount" type="number" disabled></mu-text-field>
             </mu-form-item>
-            <mu-form-item label="发票代码" prop="receiptCode">
-                <mu-text-field v-model="form.receiptCode" type="number" :disabled="disabled"></mu-text-field>
+            <mu-form-item label="发票代码" prop="receiptCode" :rules="notNullRules">
+                <mu-text-field
+                    v-model="form.receiptCode"
+                    type="number"
+                    :disabled="disabled"
+                ></mu-text-field>
             </mu-form-item>
-            <mu-form-item label="发票号码" prop="receiptNumber">
-                <mu-text-field v-model="form.receiptNumber" type="number" disabled></mu-text-field>
+            <mu-form-item label="发票号码" prop="receiptNumber" :rules="notNullRules">
+                <mu-text-field
+                    v-model="form.receiptNumber"
+                    type="number"
+                    :disabled="disabled"
+                ></mu-text-field>
             </mu-form-item>
-            <mu-form-item prop="receiptDate" label="发票日期">
+            <mu-form-item prop="receiptDate" label="发票日期" :rules="notNullRules">
                 <mu-date-input
                     v-model="form.receiptDate"
                     label-float
                     full-width
                     no-display
                     value-format="YYYY-MM-DD"
-                    disabled
+                    :disabled="disabled"
                 ></mu-date-input>
             </mu-form-item>
             <mu-form-item prop="notes" label="备注">
@@ -64,7 +71,7 @@ export default {
             title: "待审批发票",
             receiptData: "",
             contract: "",
-            disabled:true,
+            disabled: true,
             form: {
                 receiptName: "",
                 amount: "",
@@ -80,43 +87,52 @@ export default {
                 message: "Hello World, Snackbar !",
                 open: false,
                 timeout: 3000
-            }
+            },
+            notNullRules: [{ validate: val => !!val, message: "不能为空" }]
         };
     },
     methods: {
         submit() {
-            this.$axios
-                .post(
-                    "/receiptApprove",
-                    qs.stringify({
-                        approveId: this.$route.query.approveid
-                    })
-                )
-                .then(response => {
-                    if (response.data.code == 200) {
-                        let _self = this;
-                        this.$options.methods.openSnackbar(
-                            _self,
-                            "success",
-                            "已完成"
-                        );
-                        setTimeout(function() {
-                            _self.$router.replace({
-                                path: "/receipt/leaderapprove"
-                            });
-                        }, 1000);
-                    } else {
-                        let _self = this;
-                        this.$options.methods.openSnackbar(
-                            _self,
-                            "error",
-                            "失败,请重试"
-                        );
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                });
+            this.$refs.form.validate().then(result => {
+                console.log(result)
+                if (result) {
+                    this.$axios
+                        .post(
+                            "/receiptApprove/finance",
+                            qs.stringify({
+                                approveId: this.$route.query.approveid,
+                                receiptNumber:this.form.receiptNumber,
+                                receiptDate:this.form.receiptDate,
+                                receiptCode:this.form.receiptCode,
+                            })
+                        )
+                        .then(response => {
+                            if (response.data.code == 200) {
+                                let _self = this;
+                                this.$options.methods.openSnackbar(
+                                    _self,
+                                    "success",
+                                    "已完成"
+                                );
+                                setTimeout(function() {
+                                    _self.$router.replace({
+                                        path: "/receipt/financeapprove"
+                                    });
+                                }, 1000);
+                            } else {
+                                let _self = this;
+                                this.$options.methods.openSnackbar(
+                                    _self,
+                                    "error",
+                                    "失败,请重试"
+                                );
+                            }
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        });
+                }
+            });
         },
         openSnackbar(_self, color, message) {
             _self.snackbar.color = color;
@@ -147,6 +163,7 @@ export default {
             .catch(error => {
                 console.log(error);
             });
+        if (this.$route.query.type == 0) this.disabled = false;
     },
     computed: {
         icon() {

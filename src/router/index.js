@@ -222,6 +222,14 @@ const routes = [
     }
   },
   {
+    path:'/receipt/financeapprove',
+    name:'FinanceApprove',
+    component: () => import('../views/receipts_manage/FinanceWaitApprove.vue'),
+    meta: {
+      requireAuth: true,
+    }
+  },
+  {
     path:'/receipt/financeapprove/info',
     name:'FinanceApproveInfo',
     component: () => import('../views/receipts_manage/FinanceApprove.vue'),

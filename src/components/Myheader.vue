@@ -54,7 +54,13 @@
                     <mu-list-item button :ripple="false" slot="nested" to="templatedownload">
                         <mu-list-item-title>模板下载</mu-list-item-title>
                     </mu-list-item>
-                    <mu-list-item button :ripple="false" slot="nested" to="templatemanage" v-if="this.$store.state.user.department == 2">
+                    <mu-list-item
+                        button
+                        :ripple="false"
+                        slot="nested"
+                        to="templatemanage"
+                        v-if="this.$store.state.user.department == 2"
+                    >
                         <mu-list-item-title>模板管理</mu-list-item-title>
                     </mu-list-item>
                 </mu-list-item>
@@ -124,15 +130,25 @@
                     <mu-list-item-action>
                         <mu-icon class="toggle-icon" size="24" value="keyboard_arrow_down"></mu-icon>
                     </mu-list-item-action>
+                    <mu-list-item button :ripple="false" slot="nested" :to="{name:'MyReceipt'}">
+                        <mu-list-item-title>我的发票</mu-list-item-title>
+                    </mu-list-item>
                     <mu-list-item
                         button
                         :ripple="false"
                         slot="nested"
-                        :to="{name:'MyReceipt'}"
+                        :to="{name:'LeaderApprove'}"
+                        v-if="this.$store.state.user.role == 2"
                     >
-                        <mu-list-item-title>我的发票</mu-list-item-title>
+                        <mu-list-item-title>待审批</mu-list-item-title>
                     </mu-list-item>
-                    <mu-list-item button :ripple="false" slot="nested" :to="{name:'LeaderApprove'}">
+                    <mu-list-item
+                        button
+                        :ripple="false"
+                        slot="nested"
+                        :to="{name:'FinanceApprove'}"
+                        v-if="this.$store.state.user.role == 1&&this.$store.state.user.department == 1"
+                    >
                         <mu-list-item-title>待审批</mu-list-item-title>
                     </mu-list-item>
                     <mu-list-item button :ripple="false" slot="nested" :to="{name:'ApprovedList'}">
@@ -164,21 +180,20 @@ export default {
             trigger: null
         };
     },
-    methods:{
-      logout(){
-           this.$axios
-            .get("/login/logout")
-            .then(response => {
-                sessionStorage.clear();
-                this.$router.replace({
-                                    path: "/login"
-                                })
-            })
-            .catch(error => {
-                console.log(error);
-            });
-
-      }  
+    methods: {
+        logout() {
+            this.$axios
+                .get("/login/logout")
+                .then(response => {
+                    sessionStorage.clear();
+                    this.$router.replace({
+                        path: "/login"
+                    });
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        }
     },
     props: {
         title: {

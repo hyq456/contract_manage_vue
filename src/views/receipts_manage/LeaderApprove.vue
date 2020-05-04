@@ -86,7 +86,7 @@ export default {
         submit() {
             this.$axios
                 .post(
-                    "/receiptApprove",
+                    "/receiptApprove/leader",
                     qs.stringify({
                         approveId: this.$route.query.approveid
                     })
