@@ -1,81 +1,54 @@
 <template>
     <div>
         <myheader :title="title"></myheader>
-        
-        <mu-list textline="two-line">
-            <mu-list-item>
-                <mu-list-item-title>
-                        <mu-flex
-                            class="flex-demo"
-                            fill
-                        >合同名称：{{contract.name}}</mu-flex>
-                </mu-list-item-title>
-            </mu-list-item>
-            <mu-divider shallow-inset></mu-divider>
-            <mu-list-item>
-                <mu-list-item-title>
-                        <mu-flex
-                            class="flex-demo"
-                            fill
-                        >发票名称：{{receiptData.receiptName}}</mu-flex>
-                </mu-list-item-title>
-            </mu-list-item>
-            <mu-divider shallow-inset></mu-divider>
-            <mu-list-item>
-                <mu-list-item-title>
-                        <mu-flex
-                            class="flex-demo"
-                            fill
-                        >发票代码：{{receiptData.receiptCode}}</mu-flex>
-                </mu-list-item-title>
-            </mu-list-item>
-            <mu-divider shallow-inset></mu-divider>
-            <mu-list-item>
-                <mu-list-item-title>
-                        <mu-flex
-                            class="flex-demo"
-                            fill
-                        >发票号码：{{receiptData.receiptNumber}}</mu-flex>
-                </mu-list-item-title>
-            </mu-list-item>
-            <mu-divider shallow-inset></mu-divider>
-            <mu-list-item>
-                <mu-list-item-title>
-                        <mu-flex
-                            class="flex-demo"
-                            fill
-                        >发票金额：{{receiptData.amount}}元</mu-flex>
-                </mu-list-item-title>
-            </mu-list-item>
-            <mu-divider shallow-inset></mu-divider>
-            <mu-list-item>
-                <mu-list-item-title>
-                        <mu-flex
-                            class="flex-demo"
-                            fill
-                        >对方单位名称：{{receiptData.partyB}}</mu-flex>
-                </mu-list-item-title>
-            </mu-list-item>
-            <mu-divider shallow-inset></mu-divider>
-            <mu-list-item>
-                <mu-list-item-title>
-                        <mu-flex
-                            class="flex-demo"
-                            fill
-                        >发票日期：{{receiptData.receiptData}}</mu-flex>
-                </mu-list-item-title>
-            </mu-list-item>
-            <mu-divider shallow-inset></mu-divider>
-            <mu-list-item>
-                <mu-list-item-title>
-                        <mu-flex
-                            class="flex-demo"
-                            fill
-                        >备注：{{receiptData.notes}}</mu-flex>
-                </mu-list-item-title>
-            </mu-list-item>
-            <mu-divider shallow-inset></mu-divider>
-        </mu-list>
+        <br>
+        <mu-form
+            ref="form"
+            :model="form"
+            class="contract-form"
+            label-position="left"
+            label-width="100"
+            :auto-validate="false"
+        >
+            <mu-form-item label="合同名称" prop="receiptName">
+                <mu-text-field v-model="contract.name" disabled></mu-text-field>
+            </mu-form-item>
+            <mu-form-item label="发票名称" prop="receiptName">
+                <mu-text-field v-model="form.receiptName" disabled></mu-text-field>
+            </mu-form-item>
+            <mu-form-item label="对方公司" prop="partyB">
+                <mu-text-field v-model="form.partyB" type="number" disabled></mu-text-field>
+            </mu-form-item>
+            <mu-form-item label="发票金额" prop="amount">
+                <mu-text-field v-model="form.amount" type="number" suffix="元" disabled></mu-text-field>
+            </mu-form-item>
+            <mu-form-item label="发票代码" prop="receiptCode">
+                <mu-text-field v-model="form.receiptCode" type="number" disabled></mu-text-field>
+            </mu-form-item>
+            <mu-form-item label="发票号码" prop="receiptNumber">
+                <mu-text-field v-model="form.receiptNumber" type="number" disabled></mu-text-field>
+            </mu-form-item>
+            <mu-form-item prop="receiptDate" label="发票日期">
+                <mu-date-input
+                    v-model="form.receiptDate"
+                    label-float
+                    full-width
+                    no-display
+                    value-format="YYYY-MM-DD"
+                    disabled
+                ></mu-date-input>
+            </mu-form-item>
+            <mu-form-item prop="notes" label="备注">
+                <mu-text-field
+                    multi-line
+                    :rows="3"
+                    :rows-max="6"
+                    v-model="form.notes"
+                    :max-length="100"
+                    disabled
+                ></mu-text-field>
+            </mu-form-item>
+        </mu-form>
     </div>
 </template>
 
@@ -84,9 +57,19 @@ import myheader from "../../components/Myheader";
 export default {
     data() {
         return {
-            title: "我的发票",
+            title: "发票详情",
             receiptData: "",
             contract:"",
+            form: {
+                receiptName: "",
+                amount: "",
+                partyB: "",
+                notes: "",
+                receiptDate: "",
+                receiptCode: "",
+                receiptNumber: "",
+                contractId: ""
+            },
         };
     },
     mounted() {
@@ -98,6 +81,7 @@ export default {
             })
             .then(response => {
                 this.receiptData = response.data.data;
+                    this.form = response.data.data;
                 this.$axios.get("/contract/" + this.receiptData.contractId)
                 .then(response=>{
                     this.contract = response.data.data;

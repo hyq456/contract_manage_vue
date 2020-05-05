@@ -26,7 +26,7 @@
                 </mu-select>
             </mu-form-item>
             <mu-form-item label="合同金额" prop="total" :rules="notNullRules">
-                <mu-text-field v-model="form.total" type="number"></mu-text-field>
+                <mu-text-field v-model="form.total" type="number" suffix="元"></mu-text-field>
             </mu-form-item>
             <mu-form-item prop="start_date" label="合同开始日期" :rules="notNullRules">
                 <mu-date-input

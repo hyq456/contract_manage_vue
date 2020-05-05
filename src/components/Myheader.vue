@@ -124,7 +124,7 @@
                     @toggle-nested="open = arguments[0] ? 'receipt' : ''"
                 >
                     <mu-list-item-action>
-                        <mu-icon value="check_box"></mu-icon>
+                        <mu-icon value="receipt"></mu-icon>
                     </mu-list-item-action>
                     <mu-list-item-title>发票管理</mu-list-item-title>
                     <mu-list-item-action>
@@ -151,7 +151,13 @@
                     >
                         <mu-list-item-title>待审批</mu-list-item-title>
                     </mu-list-item>
-                    <mu-list-item button :ripple="false" slot="nested" :to="{name:'ApprovedList'}">
+                    <mu-list-item
+                        button
+                        :ripple="false"
+                        slot="nested"
+                        :to="{name:'ApprovedReceipt'}"
+                        v-if="this.$store.state.user.role == 2||this.$store.state.user.department == 1"
+                    >
                         <mu-list-item-title>已审批</mu-list-item-title>
                     </mu-list-item>
                 </mu-list-item>

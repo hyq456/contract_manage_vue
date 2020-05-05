@@ -237,6 +237,14 @@ const routes = [
       requireAuth: true,
     }
   },
+  {
+    path:'/receipt/approved',
+    name:'ApprovedReceipt',
+    component: () => import('../views/receipts_manage/MyApproved.vue'),
+    meta: {
+      requireAuth: true,
+    }
+  },
 ]
 
 const router = new VueRouter({
