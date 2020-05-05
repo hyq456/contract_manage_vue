@@ -489,7 +489,7 @@ export default {
                                         "success",
                                         "新增记录成功"
                                     );
-
+                                    this.recordForm.receipt = 1;
                                     this.list.splice(0, 0, this.recordForm);
                                     this.contractData.remainder =
                                         this.contractData.remainder -
