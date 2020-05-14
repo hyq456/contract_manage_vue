@@ -22,7 +22,7 @@
             </mu-form-item>
 
             <mu-form-item>
-                <mu-button color="primary" @click="submit">提交</mu-button>
+                <mu-button color="primary" @click="submit">登录</mu-button>
                 <mu-snackbar :color="snackbar.color" :open.sync="snackbar.open" position="top">
                     <mu-icon left :value="icon"></mu-icon>
                     {{snackbar.message}}

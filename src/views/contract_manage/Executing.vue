@@ -163,7 +163,7 @@
             <mu-col span="2" offset="1">
                 <mu-button
                     color="info"
-                    :to="{name:'ChangeContract', query:{id: contractData.id}}"
+                    @click="changeContract"
                 >合同变更</mu-button>
             </mu-col>
             <mu-col span="2" offset="1">
@@ -548,6 +548,27 @@ export default {
                     a.setAttribute("download", _fileName);
                     a.href = url;
                     a.click();
+                });
+        },
+        changeContract(){
+            this.$axios
+                .get("/record/ifApproving", {
+                    params: {
+                        contractId:this.contractData.id,
+                    }
+                })
+                .then(response => {
+                    if(response.data.data != 0){
+                        let _self = this;
+                        this.$options.methods.openSnackbar(
+                            _self,
+                            "error",
+                            "合同变更失败，存在审批中发票，请完成后重试"
+                        );
+                    }
+                    else{
+                        this.$router.push({ name:'ChangeContract', query:{id: this.contractData.id}})
+                    }
                 });
         },
         file() {

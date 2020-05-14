@@ -18,14 +18,14 @@
             <mu-form-item label="发票金额" prop="amount">
                 <mu-text-field v-model="form.amount" type="number" disabled></mu-text-field>
             </mu-form-item>
-            <mu-form-item label="发票代码" prop="receiptCode" :rules="notNullRules">
+            <mu-form-item label="发票代码" prop="receiptCode" :rules="codeRules">
                 <mu-text-field
                     v-model="form.receiptCode"
                     type="number"
                     :disabled="disabled"
                 ></mu-text-field>
             </mu-form-item>
-            <mu-form-item label="发票号码" prop="receiptNumber" :rules="notNullRules">
+            <mu-form-item label="发票号码" prop="receiptNumber" :rules="numberRules">
                 <mu-text-field
                     v-model="form.receiptNumber"
                     type="number"
@@ -88,7 +88,15 @@ export default {
                 open: false,
                 timeout: 3000
             },
-            notNullRules: [{ validate: val => !!val, message: "不能为空" }]
+            notNullRules: [{ validate: val => !!val, message: "不能为空" }],
+            codeRules:[
+                { validate: (val) => !!val, message: '不能为空'},
+                { validate: (val) => val.length == 12 , message: '请正确填写12位发票分类代码'}
+            ],
+            numberRules:[
+                { validate: (val) => !!val, message: '不能为空'},
+                { validate: (val) => val.length == 8 , message: '请正确填写8位发票号码'}
+            ],
         };
     },
     methods: {

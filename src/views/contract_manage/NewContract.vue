@@ -50,7 +50,7 @@
             <mu-form-item prop="textarea" label="合同描述" :rules="notNullRules">
                 <mu-text-field multi-line :rows="3" :rows-max="6" v-model="form.textarea" :max-length="255"></mu-text-field>
             </mu-form-item>
-            <mu-form-item label="合同文件" :rules="notNullRules" prop="filepath">
+            <mu-form-item label="合同文件" :rules="notNullRules" prop="filepath" help-text="仅可上传word文档">
                 <van-uploader
                     v-model="fileList"
                     upload-icon="orders-o"
@@ -122,7 +122,7 @@ export default {
     methods: {
         submit() {
             if (this.min_date > this.max_date) {
-                Toast.error("开始日期不能大于结束日期");
+                Toast.error("结束日期不能早于开始日期");
                 return;
             }
             this.$refs.form.validate().then(result => {

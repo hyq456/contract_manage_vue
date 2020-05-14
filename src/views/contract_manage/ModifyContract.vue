@@ -61,6 +61,7 @@
                     :deletable="false"
                     :preview-image="false"
                     :max-count="1"
+                    v-if="!form.filepath"
                 />
             </mu-form-item>
             <mu-form-item>
@@ -120,10 +121,8 @@ export default {
             .get("/contract/" + this.$route.query.id)
             .then(response => {
                 
-
                 this.contractData = response.data.data;
                 this.form.id = this.contractData.id;
-
                 this.form.contract_name = this.contractData.name;
                 this.form.party_b = this.contractData.partyB;
                 this.form.start_date = this.contractData.startDate;
@@ -165,8 +164,6 @@ export default {
                             })
                         )
                         .then(response => {
-                            
-
                             if (response.data.code == 200) {
                                 if (this.delfile != "") {
                                     this.$axios.post(

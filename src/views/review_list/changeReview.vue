@@ -116,7 +116,6 @@
             </mu-form-item>
             <mu-divider shallow-inset></mu-divider>
 
-
             <mu-form-item prop="describe" label="变更描述" :rules="notNullRules">
                 <mu-text-field
                     multi-line
@@ -238,15 +237,16 @@ export default {
                         this.snackbar.message = this.response.data.msg;
                         this.snackbar.color = "error";
                     }
+                    if (this.snackbar.timer) clearTimeout(this.snackbar.timer);
+                    this.snackbar.open = true;
+                    this.snackbar.timer = setTimeout(() => {
+                        this.snackbar.open = false;
+                    }, this.snackbar.timeout);
                 })
                 .catch(error => {
                     console.log(error);
                 });
-            if (this.snackbar.timer) clearTimeout(this.snackbar.timer);
-            this.snackbar.open = true;
-            this.snackbar.timer = setTimeout(() => {
-                this.snackbar.open = false;
-            }, this.snackbar.timeout);
+
             var _self = this;
             setTimeout(function() {
                 _self.$router.replace({
@@ -273,15 +273,16 @@ export default {
                         this.snackbar.message = this.response.data.msg;
                         this.snackbar.color = "error";
                     }
+                    if (this.snackbar.timer) clearTimeout(this.snackbar.timer);
+                    this.snackbar.open = true;
+                    this.snackbar.timer = setTimeout(() => {
+                        this.snackbar.open = false;
+                    }, this.snackbar.timeout);
                 })
                 .catch(error => {
                     console.log(error);
                 });
-            if (this.snackbar.timer) clearTimeout(this.snackbar.timer);
-            this.snackbar.open = true;
-            this.snackbar.timer = setTimeout(() => {
-                this.snackbar.open = false;
-            }, this.snackbar.timeout);
+
             var _self = this;
             setTimeout(function() {
                 _self.$router.replace({
