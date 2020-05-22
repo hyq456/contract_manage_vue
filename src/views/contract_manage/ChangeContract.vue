@@ -97,6 +97,8 @@
                     :deletable="false"
                     :preview-image="false"
                     :max-count="1"
+                    v-if="!form.filepath"
+                    
                 />
             </mu-form-item>
             <mu-form-item>

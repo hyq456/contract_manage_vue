@@ -161,10 +161,7 @@
                 <mu-button color="warning" @click="openStopDialog">终止合同</mu-button>
             </mu-col>
             <mu-col span="2" offset="1">
-                <mu-button
-                    color="info"
-                    @click="changeContract"
-                >合同变更</mu-button>
+                <mu-button color="info" @click="changeContract">合同变更</mu-button>
             </mu-col>
             <mu-col span="2" offset="1">
                 <mu-button color="info" @click="file" :disabled="!finish">结束归档</mu-button>
@@ -287,7 +284,7 @@ export default {
             },
             //开发票表单
             takeForm: {
-                recordId:"",
+                recordId: "",
                 amount: "",
                 partyB: "",
                 receiptName: "",
@@ -295,7 +292,7 @@ export default {
             },
             //收发票表单
             getForm: {
-                recordId:"",
+                recordId: "",
                 amount: "",
                 partyB: "",
                 receiptName: "",
@@ -371,15 +368,17 @@ export default {
         submitTakeReceipt() {
             this.$refs.takeForm.validate().then(result => {
                 if (result) {
-                    this.$axios.post("/receipt",
+                    this.$axios
+                        .post(
+                            "/receipt",
                             qs.stringify({
-                                recordId:this.takeForm.recordId,
+                                recordId: this.takeForm.recordId,
                                 amount: this.takeForm.amount,
                                 receiptName: this.takeForm.receiptName,
                                 partyB: this.takeForm.partyB,
                                 notes: this.takeForm.notes,
-                                belong:this.$store.state.user.id,
-                                contractId:this.contractData.id,
+                                belong: this.$store.state.user.id,
+                                contractId: this.contractData.id
                             })
                         )
                         .then(response => {
@@ -391,10 +390,10 @@ export default {
                                     "申请开票成功，审批中..."
                                 );
                                 this.openTake = false;
-                                // todo 
+                                // todo
                                 // 将状态改为审批中
                                 // 改为刷新，试试效果
-                                this.$router.go(0)
+                                this.$router.go(0);
                             } else {
                                 let _self = this;
                                 this.$options.methods.openSnackbar(
@@ -415,9 +414,11 @@ export default {
         submitGetReceipt() {
             this.$refs.getForm.validate().then(result => {
                 if (result) {
-                    this.$axios.post("/receipt",
+                    this.$axios
+                        .post(
+                            "/receipt",
                             qs.stringify({
-                                recordId:this.getForm.recordId,
+                                recordId: this.getForm.recordId,
                                 amount: this.getForm.amount,
                                 receiptName: this.getForm.receiptName,
                                 partyB: this.getForm.partyB,
@@ -425,8 +426,8 @@ export default {
                                 receiptDate: this.getForm.receiptDate,
                                 receiptCode: this.getForm.receiptCode,
                                 receiptNumber: this.getForm.receiptNumber,
-                                belong:this.$store.state.user.id,
-                                contractId:this.contractData.id,
+                                belong: this.$store.state.user.id,
+                                contractId: this.contractData.id
                             })
                         )
                         .then(response => {
@@ -438,10 +439,10 @@ export default {
                                     "申请收票成功，审批中..."
                                 );
                                 this.openGet = false;
-                                // todo 
+                                // todo
                                 // 将状态改为审批中
                                 // 改为刷新，试试效果
-                                this.$router.go(0)
+                                this.$router.go(0);
                             } else {
                                 let _self = this;
                                 this.$options.methods.openSnackbar(
@@ -477,8 +478,7 @@ export default {
                                     type: this.recordForm.type,
                                     number: this.recordForm.number,
                                     time: this.recordForm.time,
-                                    more: this.recordForm.more,
-                                    
+                                    more: this.recordForm.more
                                 })
                             )
                             .then(response => {
@@ -501,7 +501,6 @@ export default {
                                             100;
                                     this.$options.methods.clear(_self);
                                     this.openSimple = false;
-                                    
                                 } else {
                                     let _self = this;
                                     this.$options.methods.openSnackbar(
@@ -550,24 +549,26 @@ export default {
                     a.click();
                 });
         },
-        changeContract(){
+        changeContract() {
             this.$axios
                 .get("/record/ifApproving", {
                     params: {
-                        contractId:this.contractData.id,
+                        contractId: this.contractData.id
                     }
                 })
                 .then(response => {
-                    if(response.data.data != 0){
+                    if (response.data.data != 0) {
                         let _self = this;
                         this.$options.methods.openSnackbar(
                             _self,
                             "error",
                             "合同变更失败，存在审批中发票，请完成后重试"
                         );
-                    }
-                    else{
-                        this.$router.push({ name:'ChangeContract', query:{id: this.contractData.id}})
+                    } else {
+                        this.$router.push({
+                            name: "ChangeContract",
+                            query: { id: this.contractData.id }
+                        });
                     }
                 });
         },
@@ -617,15 +618,20 @@ export default {
                         this.$options.methods.openSnackbar(
                             _self,
                             "success",
-                            "合同归档成功"
+                            "已提交合同终止申请"
                         );
                         // TODO: 跳转界面
+                        setTimeout(function() {
+                            _self.$router.replace({
+                                path: "/executingList"
+                            });
+                        }, 1500);
                     } else {
                         let _self = this;
                         this.$options.methods.openSnackbar(
                             _self,
                             "error",
-                            "合同归档失败，请检查并重试"
+                            "提交合同终止申请失败，请检查并重试"
                         );
                     }
                     this.$options.methods.closeStopDialog();
@@ -644,13 +650,10 @@ export default {
                 _self.snackbar.open = false;
             }, _self.snackbar.timeout);
         },
-        receiptStatus(status){
-            if(status == 1)
-                return "未申请";
-            else if(status == 2)
-                return "审批中";
-            else
-                return "已完成";
+        receiptStatus(status) {
+            if (status == 1) return "未申请";
+            else if (status == 2) return "审批中";
+            else return "已完成";
         }
     },
 
@@ -675,8 +678,7 @@ export default {
                 });
             }
             return this.list;
-        },
-        
+        }
     },
     mounted() {
         this.$axios
