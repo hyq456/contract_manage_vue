@@ -9,10 +9,10 @@
             label-width="100"
             :auto-validate="false"
         >
-            <mu-form-item label="合同名称"  prop="contract_name" :rules="notNullRules">
+            <mu-form-item label="合同名称" prop="contract_name" :rules="notNullRules">
                 <mu-text-field v-model="form.contract_name"></mu-text-field>
             </mu-form-item>
-            <mu-form-item label="对方公司"  prop="party_b" :rules="notNullRules">
+            <mu-form-item label="对方公司" prop="party_b" :rules="notNullRules">
                 <mu-text-field v-model="form.party_b"></mu-text-field>
             </mu-form-item>
             <mu-form-item label="合同类型">
@@ -26,7 +26,7 @@
                 </mu-select>
             </mu-form-item>
             <mu-form-item label="合同金额" prop="total" :rules="notNullRules">
-                <mu-text-field v-model="form.total" type="number"></mu-text-field>
+                <mu-text-field v-model="form.total" type="number" suffix="元"></mu-text-field>
             </mu-form-item>
             <mu-form-item prop="start_date" label="合同开始日期" :rules="notNullRules">
                 <mu-date-input
@@ -48,14 +48,21 @@
                 ></mu-date-input>
             </mu-form-item>
             <mu-form-item prop="textarea" label="合同描述" :rules="notNullRules">
-                <mu-text-field multi-line :rows="3" :rows-max="6" v-model="form.textarea" :max-length="255"></mu-text-field>
+                <mu-text-field
+                    multi-line
+                    :rows="3"
+                    :rows-max="6"
+                    v-model="form.textarea"
+                    :max-length="255"
+                ></mu-text-field>
             </mu-form-item>
-            <mu-form-item label="合同文件" :rules="notNullRules" prop="filepath">
+            <mu-form-item label="合同文件" :rules="notNullRules" prop="filepath" help-text="仅可上传word文档">
                 <van-uploader
                     v-model="fileList"
                     upload-icon="orders-o"
-                    accept=".doc, .docx, .xml, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    accept="application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                     result-type="file"
+                    :before-read="beforeRead"
                     :after-read="afterRead"
                     :before-delete="beforeDelete"
                     multiple
@@ -77,7 +84,7 @@
                     </li>
                 </ul>
             </mu-form-item>
-           
+
             <mu-form-item>
                 <mu-button color="primary" @click="submit">提交</mu-button>
             </mu-form-item>
@@ -122,7 +129,7 @@ export default {
     methods: {
         submit() {
             if (this.min_date > this.max_date) {
-                Toast.error("开始日期不能大于结束日期");
+                Toast.error("结束日期不能早于开始日期");
                 return;
             }
             this.$refs.form.validate().then(result => {
@@ -145,12 +152,12 @@ export default {
                             })
                         )
                         .then(response => {
-                            
-
                             if (response.data.code == 200) {
                                 Toast.success("新增合同成功");
 
-                                this.$router.replace({path: '/reviewinglist'})
+                                this.$router.replace({
+                                    path: "/reviewinglist"
+                                });
                             } else {
                                 Toast.error("新增合同失败");
                             }
@@ -173,14 +180,19 @@ export default {
                     })
                 )
                 .then(response => {
-                    
-
                     if (response.data.code == 200) {
                         // this.$router.replace({path: '/showInfo'})
                     } else {
                         Toast.error("失败");
                     }
                 });
+        },
+        beforeRead(file) {
+            if (file.type !== "application/msword" && file.type !=="application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+                Toast.error("请上传 word格式文档");
+                return false;
+            }
+            return true;
         },
         afterRead(file) {
             file.status = "uploading";
@@ -190,7 +202,6 @@ export default {
             this.$axios
                 .post("/contract/uploadContract", formData)
                 .then(response => {
-                    
                     if (response.data.code == 200) {
                         file.status = "done";
                         file.message = "上传成功";

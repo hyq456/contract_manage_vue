@@ -77,7 +77,8 @@ export default {
                 position: "bottom",
                 message: "Hello World, Snackbar !",
                 open: false,
-                timeout: 3000
+                timeout: 3000,
+                color: "success"
             },
             changeData:'',
         };
@@ -122,23 +123,30 @@ export default {
                 )
                 .then(response => {
                     if (response.data.code == 200) {
-                        this.snackbar.message = "审批完成，已通过";
-                    } else this.snackbar.message = this.response.data.msg;
+                        let _self = this;
+                        this.$options.methods.openSnackbar(
+                            _self,
+                            "success",
+                            "审批完成，已通过"
+                        );
+                    } else {
+                        let _self = this;
+                        this.$options.methods.openSnackbar(
+                            _self,
+                            "error",
+                            this.response.data.msg
+                        );
+                    }
+                    var _self = this;
+                    setTimeout(function() {
+                        _self.$router.replace({
+                            path: "/waitreviewlist"
+                        });
+                    }, 1500);
                 })
                 .catch(error => {
                     console.log(error);
                 });
-            if (this.snackbar.timer) clearTimeout(this.snackbar.timer);
-            this.snackbar.open = true;
-            this.snackbar.timer = setTimeout(() => {
-                this.snackbar.open = false;
-            }, this.snackbar.timeout);
-            var _self = this;
-            setTimeout(function() {
-                                    _self.$router.replace({
-                                        path: '/waitreviewlist'
-                                    });
-                                }, 1500);
         },
         disagree() {
             this.$axios
@@ -154,24 +162,41 @@ export default {
                 )
                 .then(response => {
                     if (response.data.code == 200) {
-                        this.snackbar.message = "审批完成，已退回";
-                    } else this.snackbar.message = this.response.data.msg;
+                        let _self = this;
+                        this.$options.methods.openSnackbar(
+                            _self,
+                            "success",
+                            "审批完成，已退回"
+                        );
+                    } else {
+                        let _self = this;
+                        this.$options.methods.openSnackbar(
+                            _self,
+                            "error",
+                            this.response.data.msg
+                        );
+                    }
+                    var _self = this;
+                    setTimeout(function() {
+                        _self.$router.replace({
+                            path: "/waitreviewlist"
+                        });
+                    }, 1500);
                 })
                 .catch(error => {
                     console.log(error);
                 });
-            if (this.snackbar.timer) clearTimeout(this.snackbar.timer);
-            this.snackbar.open = true;
-            this.snackbar.timer = setTimeout(() => {
-                this.snackbar.open = false;
-            }, this.snackbar.timeout);
-            var _self = this;
-            setTimeout(function() {
-                                    _self.$router.replace({
-                                        path: '/waitreviewlist'
-                                    });
-                                }, 1500);
-        }
+        },
+
+        openSnackbar(_self, color, message) {
+            _self.snackbar.color = color;
+            _self.snackbar.message = message;
+            if (_self.snackbar.timer) clearTimeout(_self.snackbar.timer);
+            _self.snackbar.open = true;
+            _self.snackbar.timer = setTimeout(() => {
+                _self.snackbar.open = false;
+            }, _self.snackbar.timeout);
+        },
     },
     mounted() {
         this.$axios

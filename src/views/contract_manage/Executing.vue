@@ -45,6 +45,17 @@
                     </mu-flex>
                 </mu-list-item-title>
             </mu-list-item>
+
+            <mu-divider shallow-inset></mu-divider>
+            <mu-list-item>
+                <mu-list-item-title>
+                    <mu-flex
+                        class="flex-demo"
+                        justify-content="center"
+                        fill
+                    >待开票金额：{{contractData.unreceipt}}元</mu-flex>
+                </mu-list-item-title>
+            </mu-list-item>
             <mu-divider shallow-inset></mu-divider>
 
             <mu-list-item>
@@ -75,8 +86,7 @@
         <h3>履行记录</h3>
         <mu-flex justify-content="center">
             <mu-button full-width @click="openSimpleDialog" color="primary" flat>
-                <mu-icon left value="add_box"></mu-icon>
-新增记录
+                <mu-icon left value="add_box"></mu-icon>新增记录
             </mu-button>
         </mu-flex>
 
@@ -110,7 +120,7 @@
                     <mu-text-field v-model="recordForm.more"></mu-text-field>
                 </mu-form-item>
             </mu-form>
-            <mu-button slot="actions" flat color="primary" @click="closeSimpleDialog">取销</mu-button>
+            <mu-button slot="actions" flat color="primary" @click="openSimple = !openSimple">取销</mu-button>
             <mu-button slot="actions" flat color="primary" @click="submitRecord">提交</mu-button>
         </mu-dialog>
         <van-search v-model="search" placeholder="请输入搜索关键词" />
@@ -125,12 +135,24 @@
                 <div style="padding: 24px;">
                     <p>类型：{{prop.row.type==0?'收款':'付款'}}</p>
                     <p>备注：{{prop.row.more}}</p>
+                    <p>时间：{{prop.row.time}}</p>
+                    <mu-button
+                        v-if="prop.row.type == 0 && prop.row.receipt == 1"
+                        color="info"
+                        @click="openTakeDialog(prop.row.id)"
+                    >开票申请</mu-button>
+                    <mu-button
+                        v-if="prop.row.type == 1 && prop.row.receipt == 1"
+                        color="info"
+                        @click="openGetDialog(prop.row.id)"
+                    >收票申请</mu-button>
                 </div>
             </template>
             <template slot-scope="scope">
                 <td>{{scope.row.name}}</td>
                 <td class="is-center">{{scope.row.number}}</td>
-                <td class="is-center">{{scope.row.time}}</td>
+                <!-- 发票状态 1：未申请 2：审核中 3：已完成 -->
+                <td class="is-center">{{receiptStatus(scope.row.receipt)}}</td>
             </template>
         </mu-data-table>
         <br />
@@ -139,10 +161,7 @@
                 <mu-button color="warning" @click="openStopDialog">终止合同</mu-button>
             </mu-col>
             <mu-col span="2" offset="1">
-                <mu-button
-                    color="info"
-                    :to="{name:'ChangeContract', query:{id: contractData.id}}"
-                >合同变更</mu-button>
+                <mu-button color="info" @click="changeContract">合同变更</mu-button>
             </mu-col>
             <mu-col span="2" offset="1">
                 <mu-button color="info" @click="file" :disabled="!finish">结束归档</mu-button>
@@ -169,6 +188,59 @@
             <mu-button slot="actions" flat color="primary" @click="closeStopDialog">取销</mu-button>
             <mu-button slot="actions" flat color="primary" @click="stopContract">确定终止</mu-button>
         </mu-dialog>
+
+        <mu-dialog title="开票申请" width="360" :open.sync="openTake">
+            <mu-form ref="takeForm" :model="takeForm">
+                <mu-form-item prop="receiptName" label="开票名称" :rules="notNullRules">
+                    <mu-text-field v-model="takeForm.receiptName"></mu-text-field>
+                </mu-form-item>
+                <mu-form-item prop="partyB" label="对方单位" :rules="notNullRules">
+                    <mu-text-field v-model="takeForm.partyB"></mu-text-field>
+                </mu-form-item>
+                <mu-form-item prop="amount" label="金额" :rules="notNullRules">
+                    <mu-text-field type="number" v-model="takeForm.amount" suffix="元"></mu-text-field>
+                </mu-form-item>
+                <mu-form-item prop="notes" label="备注">
+                    <mu-text-field v-model="takeForm.notes"></mu-text-field>
+                </mu-form-item>
+            </mu-form>
+            <mu-button slot="actions" flat color="primary" @click="openTake = !openTake">取销</mu-button>
+            <mu-button slot="actions" flat color="primary" @click="submitTakeReceipt">提交</mu-button>
+        </mu-dialog>
+
+        <mu-dialog title="收票申请" width="360" :open.sync="openGet">
+            <mu-form ref="getForm" :model="getForm">
+                <mu-form-item prop="receiptName" label="收票名称" :rules="notNullRules">
+                    <mu-text-field v-model="getForm.receiptName"></mu-text-field>
+                </mu-form-item>
+                <mu-form-item prop="receiptCode" label="发票代码" :rules="notNullRules">
+                    <mu-text-field type="number" v-model="getForm.receiptCode"></mu-text-field>
+                </mu-form-item>
+                <mu-form-item prop="receiptNumber" label="发票号码" :rules="notNullRules">
+                    <mu-text-field type="number" v-model="getForm.receiptNumber"></mu-text-field>
+                </mu-form-item>
+                <mu-form-item prop="partyB" label="对方单位" :rules="notNullRules">
+                    <mu-text-field v-model="getForm.partyB"></mu-text-field>
+                </mu-form-item>
+                <mu-form-item prop="amount" label="金额" :rules="notNullRules">
+                    <mu-text-field type="number" v-model="getForm.amount" suffix="元"></mu-text-field>
+                </mu-form-item>
+                <mu-form-item prop="receiptDate" label="开票日期" :rules="notNullRules">
+                    <mu-date-input
+                        v-model="getForm.receiptDate"
+                        label-float
+                        full-width
+                        no-display
+                        value-format="YYYY-MM-DD"
+                    ></mu-date-input>
+                </mu-form-item>
+                <mu-form-item prop="notes" label="备注">
+                    <mu-text-field v-model="getForm.notes"></mu-text-field>
+                </mu-form-item>
+            </mu-form>
+            <mu-button slot="actions" flat color="primary" @click="openGet = !openGet">取销</mu-button>
+            <mu-button slot="actions" flat color="primary" @click="submitGetReceipt">提交</mu-button>
+        </mu-dialog>
     </div>
 </template>
 
@@ -187,24 +259,21 @@ export default {
                 order: "asc"
             },
             columns: [
-                { title: "收付款名称", name: "name" },
+                { title: "收付款名称", name: "name", align: "center" },
                 {
                     title: "收付款金额",
                     name: "number",
                     align: "center",
                     sortable: true
                 },
-                {
-                    title: "日期",
-                    name: "time",
-                    align: "center",
-                    cellAlign: "center"
-                }
+                { title: "发票状态", name: "receipt", align: "center" }
             ],
             list: [],
 
             openSimple: false,
             openStopAlert: false,
+            openGet: false,
+            openTake: false,
             value1: "",
             recordForm: {
                 name: "",
@@ -212,6 +281,25 @@ export default {
                 number: "",
                 time: "",
                 more: ""
+            },
+            //开发票表单
+            takeForm: {
+                recordId: "",
+                amount: "",
+                partyB: "",
+                receiptName: "",
+                notes: ""
+            },
+            //收发票表单
+            getForm: {
+                recordId: "",
+                amount: "",
+                partyB: "",
+                receiptName: "",
+                notes: "",
+                receiptDate: "",
+                receiptCode: "",
+                receiptNumber: ""
             },
             notNullRules: [{ validate: val => !!val, message: "不能为空" }],
             numberError: "",
@@ -245,6 +333,132 @@ export default {
         closeStopDialog() {
             this.openStopAlert = false;
         },
+        openTakeDialog(id) {
+            this.$axios
+                .get("/record", {
+                    params: {
+                        id: id
+                    }
+                })
+                .then(response => {
+                    this.takeForm.recordId = id;
+                    this.takeForm.amount = response.data.data.number;
+                    this.takeForm.partyB = this.contractData.partyB;
+                    this.takeForm.receiptName = response.data.data.name;
+                    this.openTake = true;
+                    console.log(id);
+                });
+        },
+        openGetDialog(id) {
+            this.$axios
+                .get("/record", {
+                    params: {
+                        id: id
+                    }
+                })
+                .then(response => {
+                    this.getForm.recordId = id;
+                    this.getForm.amount = response.data.data.number;
+                    this.getForm.partyB = this.contractData.partyB;
+                    this.getForm.receiptName = response.data.data.name;
+                    this.openGet = true;
+                    console.log(id);
+                });
+        },
+        submitTakeReceipt() {
+            this.$refs.takeForm.validate().then(result => {
+                if (result) {
+                    this.$axios
+                        .post(
+                            "/receipt",
+                            qs.stringify({
+                                recordId: this.takeForm.recordId,
+                                amount: this.takeForm.amount,
+                                receiptName: this.takeForm.receiptName,
+                                partyB: this.takeForm.partyB,
+                                notes: this.takeForm.notes,
+                                belong: this.$store.state.user.id,
+                                contractId: this.contractData.id
+                            })
+                        )
+                        .then(response => {
+                            if (response.data.code == 200) {
+                                let _self = this;
+                                this.$options.methods.openSnackbar(
+                                    _self,
+                                    "success",
+                                    "申请开票成功，审批中..."
+                                );
+                                this.openTake = false;
+                                // todo
+                                // 将状态改为审批中
+                                // 改为刷新，试试效果
+                                this.$router.go(0);
+                            } else {
+                                let _self = this;
+                                this.$options.methods.openSnackbar(
+                                    _self,
+                                    "error",
+                                    "申请开票失败,请重试"
+                                );
+                                this.openTake = false;
+                            }
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        });
+                }
+            });
+        },
+
+        submitGetReceipt() {
+            this.$refs.getForm.validate().then(result => {
+                if (result) {
+                    this.$axios
+                        .post(
+                            "/receipt",
+                            qs.stringify({
+                                recordId: this.getForm.recordId,
+                                amount: this.getForm.amount,
+                                receiptName: this.getForm.receiptName,
+                                partyB: this.getForm.partyB,
+                                notes: this.getForm.notes,
+                                receiptDate: this.getForm.receiptDate,
+                                receiptCode: this.getForm.receiptCode,
+                                receiptNumber: this.getForm.receiptNumber,
+                                belong: this.$store.state.user.id,
+                                contractId: this.contractData.id
+                            })
+                        )
+                        .then(response => {
+                            if (response.data.code == 200) {
+                                let _self = this;
+                                this.$options.methods.openSnackbar(
+                                    _self,
+                                    "success",
+                                    "申请收票成功，审批中..."
+                                );
+                                this.openGet = false;
+                                // todo
+                                // 将状态改为审批中
+                                // 改为刷新，试试效果
+                                this.$router.go(0);
+                            } else {
+                                let _self = this;
+                                this.$options.methods.openSnackbar(
+                                    _self,
+                                    "error",
+                                    "申请收票失败,请重试"
+                                );
+                                this.openGet = false;
+                            }
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        });
+                }
+            });
+        },
 
         submitRecord() {
             if (this.recordForm.number > this.contractData.remainder) {
@@ -276,7 +490,15 @@ export default {
                                         "新增记录成功"
                                     );
 
-                                    this.list.splice(0, 0, this.recordForm);
+                                    this.$axios
+                                        .get("/record/" + this.$route.query.id)
+                                        .then(response => {
+                                            this.list = response.data.data;
+                                        })
+                                        .catch(error => {
+                                            console.log(error);
+                                        });
+
                                     this.contractData.remainder =
                                         this.contractData.remainder -
                                         this.recordForm.number;
@@ -285,10 +507,9 @@ export default {
                                         (this.contractData.remainder /
                                             this.contractData.total) *
                                             100;
+
                                     this.$options.methods.clear(_self);
                                     this.openSimple = false;
-                                    if (this.contractData.remainder == 0)
-                                        this.finish = true;
                                 } else {
                                     let _self = this;
                                     this.$options.methods.openSnackbar(
@@ -337,6 +558,29 @@ export default {
                     a.click();
                 });
         },
+        changeContract() {
+            this.$axios
+                .get("/record/ifApproving", {
+                    params: {
+                        contractId: this.contractData.id
+                    }
+                })
+                .then(response => {
+                    if (response.data.data != 0) {
+                        let _self = this;
+                        this.$options.methods.openSnackbar(
+                            _self,
+                            "error",
+                            "合同变更失败，存在审批中发票，请完成后重试"
+                        );
+                    } else {
+                        this.$router.push({
+                            name: "ChangeContract",
+                            query: { id: this.contractData.id }
+                        });
+                    }
+                });
+        },
         file() {
             this.$axios
                 .post(
@@ -383,15 +627,20 @@ export default {
                         this.$options.methods.openSnackbar(
                             _self,
                             "success",
-                            "合同归档成功"
+                            "已提交合同终止申请"
                         );
                         // TODO: 跳转界面
+                        setTimeout(function() {
+                            _self.$router.replace({
+                                path: "/executingList"
+                            });
+                        }, 1500);
                     } else {
                         let _self = this;
                         this.$options.methods.openSnackbar(
                             _self,
                             "error",
-                            "合同归档失败，请检查并重试"
+                            "提交合同终止申请失败，请检查并重试"
                         );
                     }
                     this.$options.methods.closeStopDialog();
@@ -409,6 +658,11 @@ export default {
             _self.snackbar.timer = setTimeout(() => {
                 _self.snackbar.open = false;
             }, _self.snackbar.timeout);
+        },
+        receiptStatus(status) {
+            if (status == 1) return "未申请";
+            else if (status == 2) return "审批中";
+            else return "已完成";
         }
     },
 
@@ -444,7 +698,7 @@ export default {
                     100 -
                     (this.contractData.remainder / this.contractData.total) *
                         100;
-                if (this.contractData.remainder == 0) this.finish = true;
+                if (this.contractData.unreceipt == 0) this.finish = true;
                 if (this.contractData.type == 0) {
                     this.recordForm.type = "1";
                 } else {
@@ -464,8 +718,7 @@ export default {
             });
     },
     components: {
-        myheader,
-        record
+        myheader
     }
 };
 </script>

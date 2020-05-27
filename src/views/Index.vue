@@ -92,12 +92,16 @@
                 <mu-tabs :value.sync="saleChartSelect" inverse indicator-color="blue">
                     <mu-tab>销售额</mu-tab>
                     <mu-tab>待收帐款</mu-tab>
+                    <mu-tab>待开票账款</mu-tab>
                 </mu-tabs>
                 <div class="hello" v-if="saleChartSelect === 0">
                     <v-chart ref="piechart" :options="saleChart" auto-resize theme="light"></v-chart>
                 </div>
                 <div class="hello" v-if="saleChartSelect === 1">
                     <v-chart ref="piechart" :options="saleChartTodo" auto-resize></v-chart>
+                </div>
+                <div class="hello" v-if="saleChartSelect === 2">
+                    <v-chart ref="piechart" :options="saleChartReceipt" auto-resize theme="light"></v-chart>
                 </div>
             </mu-paper>
 
@@ -107,13 +111,17 @@
                 </div>
                 <mu-tabs :value.sync="purchaseChartSelect" inverse indicator-color="blue">
                     <mu-tab>采购款</mu-tab>
-                    <mu-tab>代付帐款</mu-tab>
+                    <mu-tab>待付帐款</mu-tab>
+                    <mu-tab>待收票账款</mu-tab>
                 </mu-tabs>
                 <div class="hello" v-if="purchaseChartSelect === 0">
                     <v-chart ref="piechart" :options="purchaseChart" auto-resize theme="light"></v-chart>
                 </div>
                 <div class="hello" v-if="purchaseChartSelect === 1">
                     <v-chart ref="piechart" :options="purchaseChartTodo" auto-resize></v-chart>
+                </div>
+                <div class="hello" v-if="purchaseChartSelect === 2">
+                    <v-chart ref="piechart" :options="purchaseChartReceipt" auto-resize theme="light"></v-chart>
                 </div>
             </mu-paper>
         </mu-container>
@@ -156,9 +164,11 @@ export default {
             //销售图表
             saleChart: {},
             saleChartTodo: {},
+            saleChartReceipt:{},
             //采购图表
             purchaseChart: {},
             purchaseChartTodo: {},
+            purchaseChartReceipt:{},
             //每月销售额
             monthSale: {},
             monthSaleBar: {},
@@ -330,10 +340,11 @@ export default {
                 this.sales.total = response.data.data.total;
                 this.sales.todo = response.data.data.todo;
                 this.sales.done = this.sales.total - this.sales.todo;
+                this.sales.unreceipt = response.data.data.unreceipt;
                 this.sales.progress =
                     100 - (this.sales.todo / this.sales.total) * 100;
 
-                //图
+                //销售额图
                 this.saleChart = {
                     tooltip: {
                         show: true,
@@ -463,6 +474,71 @@ export default {
                         }
                     ]
                 };
+                //未开票额图
+                this.saleChartReceipt = {
+                    tooltip: {
+                        show: true,
+                        trigger: "item",
+                        formatter: "{a} <br/>{b}: {c}元 ({d}%)",
+                        confine: true
+                    },
+                    graphic: {
+                        type: "group",
+                        top: "middle",
+                        left: "center",
+                        height: 80,
+                        children: [
+                            {
+                                type: "text",
+                                left: "center",
+                                top: "30%",
+                                style: {
+                                    text: "总待开票款",
+                                    textAlign: "center",
+                                    textVerticaAlign: "middle",
+                                    fill: "#999",
+                                    font: "15px 'Helvetica',sans-serif"
+                                }
+                            },
+                            {
+                                type: "text",
+                                top: "60%",
+                                left: "center",
+                                position: [0, 10],
+                                style: {
+                                    text: this.sales.unreceipt,
+                                    textAlign: "center",
+                                    textVerticaAlign: "middle",
+                                    fill: "#3d383a",
+                                    font: "22px 'Helvetica',sans-serif"
+                                }
+                            }
+                        ]
+                    },
+                    series: [
+                        {
+                            name: "待开票账款",
+                            type: "pie",
+                            radius: ["40%", "60%"],
+                            avoidLabelOverlap: true,
+                            label: {
+                                show: true,
+                                position: "outside"
+                            },
+                            emphasis: {
+                                label: {
+                                    show: true,
+                                    fontSize: "30",
+                                    fontWeight: "bold"
+                                }
+                            },
+                            labelLine: {
+                                show: true
+                            },
+                            data: response.data.data.unreceiptList
+                        }
+                    ]
+                }
             })
             .catch(error => {
                 console.log(error);
@@ -479,6 +555,7 @@ export default {
                 this.purchase.total = response.data.data.total;
                 this.purchase.todo = response.data.data.todo;
                 this.purchase.done = this.purchase.total - this.purchase.todo;
+                this.purchase.unreceipt = response.data.data.unreceipt;
                 this.purchase.progress =
                     100 - (this.purchase.todo / this.purchase.total) * 100;
 
@@ -609,6 +686,71 @@ export default {
                                 show: true
                             },
                             data: response.data.data.todoList
+                        }
+                    ]
+                };
+                //待收票款图
+                this.purchaseChartReceipt = {
+                    tooltip: {
+                        show: true,
+                        trigger: "item",
+                        formatter: "{a} <br/>{b}: {c}元 ({d}%)",
+                        confine: true
+                    },
+                    graphic: {
+                        type: "group",
+                        top: "middle",
+                        left: "center",
+                        height: 80,
+                        children: [
+                            {
+                                type: "text",
+                                left: "center",
+                                top: "30%",
+                                style: {
+                                    text: "总待收票款",
+                                    textAlign: "center",
+                                    textVerticaAlign: "middle",
+                                    fill: "#999",
+                                    font: "15px 'Helvetica',sans-serif"
+                                }
+                            },
+                            {
+                                type: "text",
+                                top: "60%",
+                                left: "center",
+                                position: [0, 10],
+                                style: {
+                                    text: this.purchase.unreceipt,
+                                    textAlign: "center",
+                                    textVerticaAlign: "middle",
+                                    fill: "#3d383a",
+                                    font: "22px 'Helvetica',sans-serif"
+                                }
+                            }
+                        ]
+                    },
+                    series: [
+                        {
+                            name: "待收账款",
+                            type: "pie",
+                            radius: ["40%", "60%"],
+                            avoidLabelOverlap: true,
+                            label: {
+                                show: true,
+                                position: "outside"
+                            },
+                            emphasis: {
+                                label: {
+                                    show: true,
+                                    fontSize: "30",
+                                    fontWeight: "bold"
+                                }
+                            },
+                            labelLine: {
+                                show: true
+                            },
+                            data: response.data.data.unreceiptList
                         }
                     ]
                 };

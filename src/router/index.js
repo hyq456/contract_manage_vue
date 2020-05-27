@@ -189,6 +189,62 @@ const routes = [
       requireAuth: true,
     }
   },
+  {
+    path: '/receipt',
+    name: 'MyReceipt',
+    component: () => import('../views/receipts_manage/MyReceipt.vue'),
+    meta: {
+      requireAuth: true,
+    }
+  },
+  {
+    path: '/receipt/info',
+    name: 'ReceiptInfo',
+    component: () => import('../views/receipts_manage/ReceiptInfo.vue'),
+    meta: {
+      requireAuth: true,
+    }
+  },
+  {
+    path:'/receipt/leaderapprove',
+    name:'LeaderApprove',
+    component: () => import('../views/receipts_manage/LeaderWaitApprove.vue'),
+    meta: {
+      requireAuth: true,
+    }
+  },
+  {
+    path:'/receipt/leaderapprove/info',
+    name:'LeaderApproveInfo',
+    component: () => import('../views/receipts_manage/LeaderApprove.vue'),
+    meta: {
+      requireAuth: true,
+    }
+  },
+  {
+    path:'/receipt/financeapprove',
+    name:'FinanceApprove',
+    component: () => import('../views/receipts_manage/FinanceWaitApprove.vue'),
+    meta: {
+      requireAuth: true,
+    }
+  },
+  {
+    path:'/receipt/financeapprove/info',
+    name:'FinanceApproveInfo',
+    component: () => import('../views/receipts_manage/FinanceApprove.vue'),
+    meta: {
+      requireAuth: true,
+    }
+  },
+  {
+    path:'/receipt/approved',
+    name:'ApprovedReceipt',
+    component: () => import('../views/receipts_manage/MyApproved.vue'),
+    meta: {
+      requireAuth: true,
+    }
+  },
 ]
 
 const router = new VueRouter({

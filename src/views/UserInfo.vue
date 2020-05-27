@@ -9,7 +9,7 @@
                 <mu-form-item label="用户名">
                     <mu-text-field v-model="userInfo.username" disabled></mu-text-field>
                 </mu-form-item>
-                <mu-form-item label="电话">
+                <mu-form-item label="电话" prop="tel" :rules="telRules">
                     <mu-text-field v-model="userInfo.tel" type="number"></mu-text-field>
                 </mu-form-item>
                 <mu-form-item label="邮箱" prop="email" :rules="mailRules">
@@ -67,8 +67,11 @@ export default {
             ],
             passwordRules:[
                 { validate: (val) => val==this.userInfo.newPw, message: '两次输入密码不一致，请重试!'},
-                
             ],
+            telRules:[
+                { validate: (val) => !!val, message: '必须填写电话号码'},
+                { validate: (val) => val.length == 11 , message: '请正确填写11位电话号码'}
+            ]
         };
     },
     methods: {
