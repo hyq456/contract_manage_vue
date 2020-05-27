@@ -489,8 +489,16 @@ export default {
                                         "success",
                                         "新增记录成功"
                                     );
-                                    this.recordForm.receipt = 1;
-                                    this.list.splice(0, 0, this.recordForm);
+
+                                    this.$axios
+                                        .get("/record/" + this.$route.query.id)
+                                        .then(response => {
+                                            this.list = response.data.data;
+                                        })
+                                        .catch(error => {
+                                            console.log(error);
+                                        });
+
                                     this.contractData.remainder =
                                         this.contractData.remainder -
                                         this.recordForm.number;
@@ -499,6 +507,7 @@ export default {
                                         (this.contractData.remainder /
                                             this.contractData.total) *
                                             100;
+
                                     this.$options.methods.clear(_self);
                                     this.openSimple = false;
                                 } else {

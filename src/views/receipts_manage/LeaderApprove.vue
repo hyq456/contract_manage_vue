@@ -10,11 +10,14 @@
             label-width="100"
             :auto-validate="false"
         >
+            <mu-form-item label="合同名称" prop="contractName">
+                <mu-text-field v-model="form.contractName" disabled></mu-text-field>
+            </mu-form-item>
             <mu-form-item label="发票名称" prop="receiptName">
                 <mu-text-field v-model="form.receiptName" disabled></mu-text-field>
             </mu-form-item>
             <mu-form-item label="对方公司" prop="partyB">
-                <mu-text-field v-model="form.partyB" type="number" disabled></mu-text-field>
+                <mu-text-field v-model="form.partyB" disabled></mu-text-field>
             </mu-form-item>
             <mu-form-item label="发票金额" prop="amount">
                 <mu-text-field v-model="form.amount" type="number" disabled></mu-text-field>
@@ -65,6 +68,7 @@ export default {
             receiptData: "",
             contract: "",
             form: {
+                contractName:"",
                 receiptName: "",
                 amount: "",
                 partyB: "",
@@ -127,7 +131,7 @@ export default {
             }, _self.snackbar.timeout);
         }
     },
-    mounted() {
+    created() {
         this.$axios
             .get("/receipt/", {
                 params: {
@@ -140,12 +144,14 @@ export default {
                 this.$axios
                     .get("/contract/" + this.receiptData.contractId)
                     .then(response => {
-                        this.contract = response.data.data;
+                        this.$set(this.form, 'contractName', response.data.data.name)
                     });
             })
+            
             .catch(error => {
                 console.log(error);
             });
+        this.$forceUpdate
     },
     computed: {
         icon() {
